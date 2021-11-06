@@ -1,0 +1,37 @@
+{
+  "bridge": {
+    "name": "Homebridge",
+    "username": "0E:15:CC:8A:E9:1E",
+    "port": 51609,
+    "pin": "983-44-986"
+  },
+  "plugins": ["homebridge-philipsair-platform"],
+  "accessories": [],
+  "platforms": [
+    {
+      "platform": "PhilipsAirPlatform",
+      "name": "PhilipsAirPlatform",
+      "debug": false,
+      "warn": true,
+      "error": true,
+      "extendedError": true,
+      "devices": [
+        {
+          "active": true,
+          "name": "Livingroom Philips",
+          "manufacturer": "Philips",
+          "model": "AC3829",
+          "serialNumber": "000000",
+          "host": "192.168.178.111",
+          "port": 5683,
+          "light": true,
+          "temperature": true,
+          "humidity": true,
+          "humidifier": true,
+          "allergicFunc": true,
+          "sleepSpeed": true
+        }
+      ]
+    }
+  ]
+}

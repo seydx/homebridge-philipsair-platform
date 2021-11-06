@@ -1,0 +1,61 @@
+{
+  "name": "homebridge-philipsair-platform",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for philips air purifier and humidifier.",
+  "author": "SeydX (https://github.com/SeydX/homebridge-philipsair-platform)",
+  "scripts": {
+    "lint": "eslint --fix .",
+    "prepublishOnly": "npm i --package-lock-only && npm audit fix && npm run lint"
+  },
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "7.16.0",
+    "@babel/eslint-parser": "7.16.0",
+    "@babel/eslint-plugin": "7.14.5",
+    "eslint": "^8.2.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.2",
+    "eslint-plugin-jest": "^25.2.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-unicorn": "^38.0.0",
+    "prettier": "^2.4.1"
+  },
+  "bugs": {
+    "url": "https://github.com/SeydX/homebridge-philipsair-platform/issues"
+  },
+  "engines": {
+    "node": ">=14.18.0",
+    "homebridge": "^1.3.0"
+  },
+  "funding": [
+    {
+      "type": "paypal",
+      "url": "https://paypal.me/seydx"
+    },
+    {
+      "type": "kofi",
+      "url": "https://ko-fi.com/seydx"
+    },
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/SeydX"
+    }
+  ],
+  "homepage": "https://github.com/SeydX/homebridge-philipsair-platform#readme",
+  "keywords": [
+    "philips",
+    "homebridge-plugin",
+    "air",
+    "purifier",
+    "homekit",
+    "humidifier",
+    "temperature",
+    "humidity"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SeydX/homebridge-philipsair-platform.git"
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "pluginAlias": "PhilipsAirPlatform",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Homebridge Plugin for Philips Air Purifiers / Humidifiers.",
+  "footerDisplay": "For documentation please see [GitHub repository](https://github.com/SeydX/homebridge-philipsair-platform)",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "title": "Name",
+        "type": "string",
+        "default": "PhilipsAirPlatform",
+        "description": "Name for the log."
+      },
+      "debug": {
+        "title": "Debug Log",
+        "type": "boolean",
+        "description": "Enables additional output (debug) in the log."
+      },
+      "warn": {
+        "title": "Warn Log",
+        "type": "boolean",
+        "description": "Enables additional output (warn) in the log.",
+        "default": true
+      },
+      "error": {
+        "title": "Error Log",
+        "type": "boolean",
+        "description": "Enables additional output (error) in the log.",
+        "default": true
+      },
+      "extendedError": {
+        "title": "Extended Error Log",
+        "type": "boolean",
+        "description": "Enables additional output (detailed error) in the log.",
+        "default": true,
+        "condition": {
+          "functionBody": "try { return model.error } catch(e){ return false }"
+        }
+      },
+      "devices": {
+        "title": "Devices",
+        "type": "array",
+        "required": true,
+        "minLength": 1,
+        "items": {
+          "title": "Air Purifier",
+          "type": "object",
+          "properties": {
+            "active": {
+              "title": "Active",
+              "type": "boolean",
+              "description": "If enabled, the device will be exposed to HomeKit."
+            },
+            "name": {
+              "title": "Name",
+              "type": "string",
+              "required": true,
+              "description": "Set the device name for display in the Home app."
+            },
+            "manufacturer": {
+              "name": "Manufacturer",
+              "type": "string",
+              "placeholder": "Fritz Box",
+              "description": "Set the manufacturer name for display in the Home app."
+            },
+            "model": {
+              "name": "Model",
+              "type": "string",
+              "placeholder": "Fritz Box",
+              "description": "Set the model for display in the Home app."
+            },
+            "serialNumber": {
+              "name": "Serial Number",
+              "type": "string",
+              "placeholder": "SerialNumber",
+              "description": "Set the serial number for display in the Home app."
+            },
+            "host": {
+              "title": "Host Address",
+              "type": "string",
+              "required": true,
+              "format": "ipv4",
+              "placeholder": "10.0.1.16",
+              "description": "IP address of your device.",
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              }
+            },
+            "port": {
+              "title": "Port",
+              "type": "integer",
+              "placeholder": 5683,
+              "description": "Port of your device.",
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              }
+            },
+            "humidifier": {
+              "title": "Humidifier",
+              "type": "boolean",
+              "description": "Expose a separate humidifier accessory to HomeKit."
+            },
+            "light": {
+              "title": "Light",
+              "type": "boolean",
+              "description": "Expose device lights as lightbulbs to HomeKit."
+            },
+            "temperature": {
+              "title": "Temperature sensor",
+              "type": "boolean",
+              "description": "Expose device temperature as temperature sensor to HomeKit."
+            },
+            "humidity": {
+              "title": "Humidity sensor",
+              "type": "boolean",
+              "description": "Expose device humidity as humidity sensor to HomeKit."
+            },
+            "sleepSpeed": {
+              "title": "Sleep Speed",
+              "type": "boolean",
+              "description": "Does this device support 'sleep' speed?"
+            },
+            "allergicFunc": {
+              "title": "Allergic mode function",
+              "type": "boolean",
+              "description": "Does this device support 'allergic' function?"
+            }
+          }
+        }
+      }
+    }
+  },
+  "layout": [
+    "name",
+    {
+      "title": "Log",
+      "orderable": false,
+      "expandable": true,
+      "expanded": false,
+      "type": "section",
+      "items": ["debug", "warn", "error", "extendedError"]
+    },
+    {
+      "title": "Devices",
+      "expandable": true,
+      "expanded": true,
+      "orderable": false,
+      "type": "section",
+      "items": [
+        {
+          "key": "devices",
+          "type": "array",
+          "orderable": false,
+          "buttonText": "Add Device",
+          "items": [
+            "devices[].active",
+            "devices[].name",
+            "devices[].host",
+            "devices[].port",
+            {
+              "key": "devices[]",
+              "type": "section",
+              "title": "Branding",
+              "expandable": true,
+              "expanded": false,
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              },
+              "items": ["devices[].manufacturer", "devices[].model", "devices[].serialNumber"]
+            },
+            {
+              "key": "devices[]",
+              "type": "section",
+              "title": "Accessories",
+              "expandable": true,
+              "expanded": false,
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              },
+              "items": ["devices[].humidifier", "devices[].light", "devices[].temperature", "devices[].humidity"]
+            },
+            {
+              "key": "devices[]",
+              "type": "section",
+              "title": "Extras",
+              "expandable": true,
+              "expanded": false,
+              "condition": {
+                "functionBody": "try { return model.devices[arrayIndices[0]].active } catch(e){ return false }"
+              },
+              "items": ["devices[].sleepSpeed", "devices[].allergicFunc"]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
