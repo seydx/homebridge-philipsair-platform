@@ -41,7 +41,7 @@ You also need the `aioairctrl` module from [Peter-J](https://github.com/Peter-J/
 sudo pip3 install -U git+https://github.com/Peter-J/aioairctrl
 ```
 
-## Example Config (minimal)
+## Example Config
 
 
 ```
