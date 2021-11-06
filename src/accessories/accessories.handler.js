@@ -350,9 +350,6 @@ class Handler {
 
     this.airControl.stdout.on('data', async (data) => {
       this.obj = JSON.parse(data.toString());
-
-      console.log(this.obj);
-
       logger.debug(data.toString(), this.accessory.displayName);
 
       //Air Purifier
