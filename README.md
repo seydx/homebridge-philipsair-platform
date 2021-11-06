@@ -17,9 +17,15 @@
 
 ## Info
 
-This is a plugin for Philips Air Purifier/Humidifier. 
+This is a plugin for Philips Air Purifier/Humidifier.
 
-> This project is heavily inspired by https://github.com/NikDevx/homebridge-philips-air - Since the plugin didn't work for me, I wrote a new one from scratch. The **homebridge-philips-air** was a very great help for the implementation!
+This plugin supports following functions:
+
+- Air Purifier
+- Humidifier
+- Device Lights
+- Temperature Sensor
+- Humidity Sensor
 
 ## Installation
 
@@ -41,8 +47,8 @@ You also need the `aioairctrl` module from [Peter-J](https://github.com/Peter-J/
 sudo pip3 install -U git+https://github.com/Peter-J/aioairctrl
 ```
 
-## Example Config
 
+## Example Config
 
 ```
 {
@@ -78,7 +84,37 @@ sudo pip3 install -U git+https://github.com/Peter-J/aioairctrl
 
 ```
 
+| Fields           | Description                                                  | Default                | Required |
+|------------------|--------------------------------------------------------------|------------------------|----------|
+| **platform**     | Must always be `PhilipsAirPlatform`.                         | `"PhilipsAirPlatform"` | Yes      |
+| name             | For logging purposes.                                        | `"PhilipsAirPlatform"` | No       |
+| debug            | Enables additional output (debug) in the log.                | `false`                | No       |
+| warn             | Enables additional output (warn) in the log.                 | `true`                 | No       |
+| error            | Enables additional output (error) in the log.                | `true`                 | No       |
+| extendedError    | Enables additional output (detailed debug) in the log.       | `true`                 | No       |
+| **devices**      | Array of Philips air purifiers.                              |                        | Yes      |
+|- name            | Unique name of your device.                                  |                        | Yes      |
+|- **host**        | Host/IP address of your device.                              |                        | Yes      |
+|- port            | Port of your device.                                         | `5683`                 | No       |
+|- manufacturer    | Set the manufacturer name for display in the Home app.       | `"Philips"`            | No       |
+|- model           | Set the model for display in the Home app.                   | `"Air Purifier"`       | No       |
+|- serialNumber    | Set the serial number for display in the Home app.           | `"000000"`             | No       |
+|- humidifier      | Expose a separate humidifier accessory to HomeKit.           | `false`                | No       |
+|- light           | Expose device lights as lightbulbs to HomeKit.               | `false`                | No       |
+|- temperature     | Expose device temperature as temperature sensor to HomeKit.  | `false`                | No       |
+|- humidity        | Expose device humidity as humidity sensor to HomeKit.        | `false`                | No       |
+|- allergicFunc    | Does this device support 'allergic' function?                | `false`                | No       |
+|- sleepSpeed      | Does this device support 'sleep' speed?                      | `false`                | No       |
+
 For a full config.json, please look at [Example Config](https://github.com/SeydX/homebridge-philipsair-platform/blob/master/example-config.json) for more details.
+
+
+# Tested devices
+
+The following devices have been tested with this plugin and confirm that they work without problems
+
+- AC3829
+
 
 # Supported clients
 
@@ -90,8 +126,14 @@ This plugin has been verified to work with the following apps/systems:
 - Homebridge >= v1.3.0
 - Node >= 14
 
+# TODO
+
+- [ ] FakeGato Support
+
 
 # Contributing
+
+> This project is heavily inspired by https://github.com/NikDevx/homebridge-philips-air - Since the plugin didn't work for me, I wrote a new one from scratch. The **homebridge-philips-air** was a very great help for the implementation!
 
 You can contribute to this homebridge plugin in following ways:
 

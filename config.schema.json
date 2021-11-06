@@ -62,19 +62,22 @@
             "manufacturer": {
               "name": "Manufacturer",
               "type": "string",
-              "placeholder": "Fritz Box",
+              "placeholder": "Philips",
+              "default": "Philips",
               "description": "Set the manufacturer name for display in the Home app."
             },
             "model": {
               "name": "Model",
               "type": "string",
-              "placeholder": "Fritz Box",
+              "placeholder": "Air Purifier",
+              "default": "Air Purifier",
               "description": "Set the model for display in the Home app."
             },
             "serialNumber": {
               "name": "Serial Number",
               "type": "string",
-              "placeholder": "SerialNumber",
+              "placeholder": "000000",
+              "default": "000000",
               "description": "Set the serial number for display in the Home app."
             },
             "host": {
