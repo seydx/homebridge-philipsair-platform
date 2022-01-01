@@ -94,6 +94,7 @@ sudo pip3 install -U git+https://github.com/Peter-J/aioairctrl
 | error            | Enables additional output (error) in the log.                | `true`                 | No       |
 | extendedError    | Enables additional output (detailed debug) in the log.       | `true`                 | No       |
 | **devices**      | Array of Philips air purifiers.                              |                        | Yes      |
+|- active          | Whether the device is active and should be used              |                        | Yes      |
 |- name            | Unique name of your device.                                  |                        | Yes      |
 |- **host**        | Host/IP address of your device.                              |                        | Yes      |
 |- port            | Port of your device.                                         | `5683`                 | No       |
