@@ -16,7 +16,7 @@ class Handler {
 
     this.args = [
       'python3',
-      `${path.resolve(__dirname, '../../')}/lib/pyaircontrol.py`,
+      `"${path.resolve(__dirname, '../../')}/lib/pyaircontrol.py"`,
       '-H',
       this.accessory.context.config.host,
       '-P',
