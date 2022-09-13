@@ -13,6 +13,61 @@ class Handler {
     this.shutdown = false;
     this.airControl = null;
     this.obj = {};
+    this.keyMaps = {};
+    this.valueMaps = {};
+    this.speeds = [{ om: '1' }, { om: '2' }, { om: 't' }];
+
+    // FIXME: Sleep speed is likely to be removed with new config approach
+    if (this.accessory.context.config.sleepSpeed) {
+      this.speeds = [
+        { om: 's' }, 
+        { om: '1' }, 
+        { om: '2' }, 
+        { om: 't' }
+      ];
+    }
+
+    // FIXME: Here we test for some models (set with configuration, not yet pulled from received type or modelid)
+    // This should be extracted into a separate configuration function which handles different models.
+    if (this.accessory.context.config.model == 'AC3036' || this.accessory.context.config.model == 'AC1715') {
+      this.speeds = [
+        { mode: 'S' },
+        { mode: 'AG' },
+        { mode: 'M', om: 1 },
+        { mode: 'M', om: 2 },
+        { mode: 'T' }
+      ];
+    }
+
+    if (this.accessory.context.config.model == 'AC1715') {
+      this.keyMaps = {
+        pwr: 'D03-02',
+        om: 'D03-13',
+        speed: 'D03-13',
+        mode: 'D03-11',
+        cl: 'D03-03',
+        aqil: 'D03-04',
+        uil: 'D03-05',
+        iaql: 'D03-32',
+        pm25: 'D03-33',
+        fltt1: 'D05-02',
+        fltt2: 'D05-03',
+        flttotal0: 'D05-07',
+        flttotal1: 'D05-08',
+        flttotal2: 'D05-09',
+        fltsts0: 'D05-13',
+        fltsts1: 'D05-14',
+        fltsts2: 'D05-15',
+      };
+      this.valueMaps = {
+        pwr: {
+          OFF: 0,
+          ON: 1,
+          0: 'OFF',
+          1: 'ON',
+        },
+      };
+    }
 
     this.args = [
       'python3',
@@ -40,13 +95,47 @@ class Handler {
     });
   }
 
+  handleResponse(json) {
+    this.obj = json;
+
+    Object.entries(this.keyMaps).forEach(([key, mappedKey]) => {
+      this.obj[key] = this.valueMaps[key] ? this.valueMaps[key][this.obj[mappedKey]] : this.obj[mappedKey];
+      delete this.obj[mappedKey];
+    });
+
+    logger.debug(this.obj, this.accessory.displayName);
+  }
+
+  handleCommand(key, value) {
+    key = this.keyMaps[key] || key;
+    value = this.valueMaps[key] ? this.valueMaps[key][value] : value;
+    logger.debug(`${key}=${value}`, this.accessory.displayName);
+
+    return `${key}=${value}`;
+  }
+
+  speedsMinStep() {
+    return 100 / this.speeds.length;
+  }
+
+  rotationSpeed() {
+    let speedConfigIndex = this.speeds.findIndex((speedConfig) => {
+      return Object.entries(speedConfig).every(([cmd, value]) => {
+        return this.obj[cmd].toString() == value.toString();
+      });
+    });
+    let speedIndex = speedConfigIndex + 1;
+    logger.debug(`#rotationSpeed: ${speedIndex * this.speedsMinStep()}`, this.accessory.displayName);
+    return speedIndex * this.speedsMinStep();
+  }
+
   //Air Purifier
   async setPurifierActive(state) {
     try {
       const stateNumber = state ? 1 : 0;
 
       const args = [...this.args];
-      args.push('set', `pwr=${stateNumber}`);
+      args.push('set', `${this.handleCommand('pwr', stateNumber)}`);
 
       this.purifierService.updateCharacteristic(this.api.hap.Characteristic.CurrentAirPurifierState, stateNumber * 2);
 
@@ -71,7 +160,7 @@ class Handler {
       }
 
       const args = [...this.args];
-      args.push('set', `mode=${values.mode}`);
+      args.push('set', `${this.handleCommand('mode', values.mode)}`);
 
       logger.info(`Purifier Mode: ${state}`, this.accessory.displayName);
 
@@ -89,7 +178,7 @@ class Handler {
       };
 
       const args = [...this.args];
-      args.push('set', `cl=${values.cl}`);
+      args.push('set', `${this.handleCommand('cl', values.cl)}`);
 
       logger.info(`Lock: ${state}`, this.accessory.displayName);
 
@@ -102,36 +191,20 @@ class Handler {
 
   async setPurifierRotationSpeed(value) {
     try {
-      let divisor = 25;
-      let offset = 0;
-
-      if (this.accessory.context.config.sleepSpeed) {
-        divisor = 20;
-        offset = 1;
-      }
-
-      const speed = Math.ceil(value / divisor);
+      const speed = Math.ceil(value / this.speedsMinStep());
 
       if (speed > 0) {
-        const values = {
-          mode: 'M',
-          om: '',
-        };
-
-        if (offset == 1 && speed == 1) {
-          values.om = 's';
-        } else if (speed < 4 + offset) {
-          values.om = (speed - offset).toString();
-        } else {
-          values.om = 't';
-        }
-
         this.purifierService.updateCharacteristic(this.api.hap.Characteristic.TargetAirPurifierState, 0);
+        logger.info(`Purifier Rotation Speed: value: ${value}`, this.accessory.displayName);
 
-        const args = [...this.args];
-        args.push('set', `mode=${values.mode} om=${values.om}`);
+        let args = [...this.args];
+        let cmds = [];
+        Object.entries(this.speeds[speed - 1]).forEach(([cmd, value]) => {
+          cmds.push(`${this.handleCommand(cmd, value)}`);
+        });
+        args.push('set', cmds.join(' '));
 
-        logger.info(`Purifier Rotation Speed: ${value}`, this.accessory.displayName);
+        logger.info(`Purifier Rotation Speed: cmds: ${cmds.join(' ')}`, this.accessory.displayName);
 
         await this.sendCMD(args);
       }
@@ -186,7 +259,7 @@ class Handler {
       }
 
       const args = [...this.args];
-      args.push('set', `func=${values.func}`);
+      args.push('set', `${this.handleCommand('func', values.func)}`);
 
       logger.info(`Humidifier Active: ${state}`, this.accessory.displayName);
 
@@ -247,8 +320,8 @@ class Handler {
       const args1 = [...this.args];
       const args2 = [...this.args];
 
-      args1.push('set', `func=${values.func}`);
-      args2.push('set', `rhset=${values.rhset}`, '-I');
+      args1.push('set', `${this.handleCommand('func', values.func)}`);
+      args2.push('set', `${this.handleCommand('rhset', values.rhset)}`, '-I');
 
       logger.info(`Humidifier State: ${state}`, this.accessory.displayName);
 
@@ -282,8 +355,8 @@ class Handler {
       const args1 = [...this.args];
       const args2 = [...this.args];
 
-      args1.push('set', `aqil=${values.aqil}`, '-I');
-      args2.push('set', `uil=${values.uil}`);
+      args1.push('set', `${this.handleCommand('aqil', values.aqil)}`, '-I');
+      args2.push('set', `${this.handleCommand('uil', values.uil)}`);
 
       logger.info(`Light state: ${state}`, this.accessory.displayName);
 
@@ -314,8 +387,8 @@ class Handler {
       const args1 = [...this.args];
       const args2 = [...this.args];
 
-      args1.push('set', `aqil=${values.aqil}`, '-I');
-      args2.push('set', `uil=${values.uil}`);
+      args1.push('set', `${this.handleCommand('aqil', values.aqil)}`, '-I');
+      args2.push('set', `${this.handleCommand('uil', values.uil)}`);
 
       logger.info(`Brightness: ${value}`, this.accessory.displayName);
 
@@ -349,8 +422,7 @@ class Handler {
     this.airControl = spawn(args.shift(), args);
 
     this.airControl.stdout.on('data', async (data) => {
-      this.obj = JSON.parse(data.toString());
-      logger.debug(data.toString(), this.accessory.displayName);
+      this.handleResponse(JSON.parse(data.toString()));
 
       //Air Purifier
       this.purifierService
@@ -358,16 +430,7 @@ class Handler {
         .updateCharacteristic(this.api.hap.Characteristic.CurrentAirPurifierState, parseInt(this.obj.pwr) * 2)
         .updateCharacteristic(this.api.hap.Characteristic.TargetAirPurifierState, this.obj.mode === 'M' ? 0 : 1)
         .updateCharacteristic(this.api.hap.Characteristic.LockPhysicalControls, this.obj.cl ? 1 : 0)
-        .updateCharacteristic(
-          this.api.hap.Characteristic.RotationSpeed,
-          this.obj.om === 't'
-            ? 100
-            : this.obj.om === 's'
-            ? this.accessory.context.config.sleepSpeed
-              ? 20
-              : 25
-            : parseInt(this.obj.om) * (this.accessory.context.config.sleepSpeed ? 20 : 25)
-        );
+        .updateCharacteristic(this.api.hap.Characteristic.RotationSpeed, this.rotationSpeed());
 
       if (this.airQualityService) {
         this.airQualityService
@@ -448,7 +511,7 @@ class Handler {
 
       if (this.preFilterService) {
         const fltsts0change = this.obj.fltsts0 == 0;
-        const fltsts0maxlife = (this.obj.flttotal0) ? this.obj.flttotal0 : 360
+        const fltsts0maxlife = this.obj.flttotal0 ? this.obj.flttotal0 : 360;
         const fltsts0life = (this.obj.fltsts0 / fltsts0maxlife) * 100;
 
         this.preFilterService
@@ -458,7 +521,7 @@ class Handler {
 
       if (this.carbonFilterService) {
         const fltsts2change = this.obj.fltsts2 == 0;
-        const fltsts2maxlife = (this.obj.flttotal2) ? this.obj.flttotal2 : 4800        
+        const fltsts2maxlife = this.obj.flttotal2 ? this.obj.flttotal2 : 4800;
         const fltsts2life = (this.obj.fltsts2 / fltsts2maxlife) * 100;
 
         this.carbonFilterService
@@ -468,7 +531,7 @@ class Handler {
 
       if (this.hepaFilterService) {
         const fltsts1change = this.obj.fltsts1 == 0;
-        const fltsts1maxlife = (this.obj.flttotal1) ? this.obj.flttotal1 : 4800        
+        const fltsts1maxlife = this.obj.flttotal1 ? this.obj.flttotal1 : 4800;
         const fltsts1life = (this.obj.fltsts1 / fltsts1maxlife) * 100;
 
         this.hepaFilterService
