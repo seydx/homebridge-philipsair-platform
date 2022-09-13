@@ -5,6 +5,8 @@
   "author": "SeydX (https://github.com/SeydX/homebridge-philipsair-platform)",
   "scripts": {
     "lint": "eslint --fix .",
+    "watch": "npm run build && npm link && nodemon",
+    "build": "rimraf ./dist",
     "prepublishOnly": "npm i --package-lock-only && npm audit fix && npm run lint"
   },
   "main": "index.js",
@@ -13,13 +15,16 @@
     "@babel/core": "7.16.0",
     "@babel/eslint-parser": "7.16.0",
     "@babel/eslint-plugin": "7.14.5",
-    "eslint": "^8.2.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-jest": "^25.2.3",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-unicorn": "^38.0.0",
-    "prettier": "^2.4.1"
+    "eslint": "^8.2.0",
+    "homebridge": "^1.3.5",
+    "nodemon": "^2.0.13",
+    "prettier": "^2.4.1",
+    "rimraf": "^3.0.2",
   },
   "bugs": {
     "url": "https://github.com/SeydX/homebridge-philipsair-platform/issues"
