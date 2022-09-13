@@ -17,12 +17,15 @@ class Handler {
     this.valueMaps = {};
     this.speeds = [{ om: '1' }, { om: '2' }, { om: 't' }];
 
+    // FIXME: Sleep speed is likely to be removed with new config approach
     if (this.accessory.context.config.sleepSpeed) {
       this.speeds = [{ om: 's' }, { om: '1' }, { om: '2' }, { om: 't' }];
     }
 
     if (this.accessory.context.config.model == 'AC3036/10' || this.accessory.context.config.model == 'AC1715/11') {
       this.speeds = [{ mode: 'S' }, { mode: 'AG' }, { mode: 'M', om: 1 }, { mode: 'M', om: 2 }, { mode: 'T' }];
+    // FIXME: Here we test for some models (set with configuration, not yet pulled from received type or modelid)
+    // This should be extracted into a separate configuration function which handles different models.
     }
 
     if (this.accessory.context.config.model == 'AC1715/11') {
