@@ -61,7 +61,7 @@ class Accessory {
       .setProps({
         minValue: 0,
         maxValue: 100,
-        minStep: this.accessory.context.config.sleepSpeed ? 20 : 25,
+        minStep: this.handler.speedsMinStep(),
       });
 
     //Service.AirQuality
