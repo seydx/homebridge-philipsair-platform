@@ -99,7 +99,7 @@ sudo pip3 install -U git+https://github.com/Peter-J/aioairctrl
 |- **host**        | Host/IP address of your device.                              |                        | Yes      |
 |- port            | Port of your device.                                         | `5683`                 | No       |
 |- manufacturer    | Set the manufacturer name for display in the Home app.       | `"Philips"`            | No       |
-|- model           | Set the model for display in the Home app.                   | `"Air Purifier"`       | No       |
+|- model           | Set the model for display in the Home app.                   | `"Air Purifier"`       | No *1       |
 |- serialNumber    | Set the serial number for display in the Home app.           | `"000000"`             | No       |
 |- humidifier      | Expose a separate humidifier accessory to HomeKit.           | `false`                | No       |
 |- light           | Expose device lights as lightbulbs to HomeKit.               | `false`                | No       |
@@ -110,13 +110,20 @@ sudo pip3 install -U git+https://github.com/Peter-J/aioairctrl
 
 For a full config.json, please look at [Example Config](https://github.com/SeydX/homebridge-philipsair-platform/blob/master/example-config.json) for more details.
 
+## Notes
+
+1. Use model ids from below which already have tested configuration. If not only a fallback strategy will be used which limits compatibility a lot.
 
 # Tested devices
 
-The following devices have been tested with this plugin and confirm that they work without problems
+The following devices have been tested with this plugin and confirm that they work without problems:
+
+- AC3036
+- AC1715
+
+Not yet confirmed with new configuration approach:
 
 - AC3829
-
 
 # Supported clients
 
